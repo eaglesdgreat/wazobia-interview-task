@@ -1,0 +1,141 @@
+.app {
+  background-color: var(--background-color);
+  font: normal normal normal 14px/22px var(--font-base);
+  color: var(--primary-color);
+  letter-spacing: 0px;
+  opacity: 1;
+
+  h1 {
+    font: normal normal bold 24px/36px var(--font-base);
+  }
+}
+
+.app__container {
+  top: 80px;
+  width: 662px;
+  min-height: 813px;
+  background: #FAFAFA 0% 0% no-repeat padding-box;
+  border: 1px solid #E7F1E9;
+  border-radius: 4px 4px 0px 0px;
+
+  &--items {
+    padding: 20px;
+  }
+
+  hr {
+    margin-top: 50px;
+    border: 1px solid #E7F1E9;
+    width: 100%
+  }
+}
+
+.app__bottom {
+  justify-content: flex-end;
+  height: 27px;
+  width: 662px;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  border: 1px solid #E7F1E9;
+  border-radius: 0px 0px 4px 4px;
+  padding: 20px;
+
+  text-align: right;
+  font: normal normal normal 10px/18px var(--font-base);
+}
+
+.app__btn {
+  justify-content: flex-end;
+  width: 662px;
+  padding-top: 20px;
+
+  &--item {
+    width: 62px;
+    height: 35px;
+    background: #0A7227 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+
+    text-align: center;
+    font: normal normal 600 14px/22px var(--font-base);
+    letter-spacing: 0px;
+    color: #FFFFFF;
+  }
+}
+
+.app__embed {
+  width: 32px;
+  height: 32px;
+  background: #E7F1E9 0% 0% no-repeat padding-box;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.app__modal {
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  box-shadow: 0px 1px 4px #00000014;
+  border-radius: 3px;
+  width: 277px;
+  height: 191px;
+  margin-top: 10px;
+
+  a {
+    text-decoration: none;
+    color: var(--primary-color);
+  }
+
+  &--header {
+    text-align: left;
+    letter-spacing: 0.13px;
+    color: #333333;
+    text-transform: uppercase;
+    padding: 10px;
+  }
+
+  &--items {
+    width: 277px;
+    height: 46px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    cursor: pointer;
+
+    &__icon {
+      align-items: flex-start !important;
+      height: 100%;
+      padding: 11px;
+    }
+
+    &__text {
+      height: 35px;
+
+      span {
+        text-align: left;
+        font: normal normal 600 12px/18px var(--font-base);
+        color: #010E05;
+      }
+  
+      p {
+        text-align: left;
+        font: normal normal normal 8px/18px var(--font-base);
+        color: #343E37;
+        margin: -2px;
+      }
+    }
+
+    &:hover {
+      background: #F7FCF8 0% 0% no-repeat padding-box
+    }
+  }
+}
+
+.app__flex {
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+
+  &--padding {
+    padding: 80px;
+    flex-direction: column;
+  }
+}
