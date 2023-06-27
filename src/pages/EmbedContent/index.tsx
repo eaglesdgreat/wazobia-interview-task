@@ -50,14 +50,17 @@ const EmbedContent = () => {
       return backToHome()
     }
 
-    if (type === 'social' && data.url) {
+    if (type === 'social' && data.url && data.code) {
+      const socialPayload = { type: 'link', url: data.url, code: data.code, children: [{ text: "" }] }
+
       dispatch({
-        type: Types.Video,
-        payload: data
+        type: Types.EditorText,
+        payload: [ ...state.editor, socialPayload, defaultPayload],
       })
+
       return backToHome()
     }
-    alert("error no file found!")
+    alert("error no file or url found!")
   }
 
   const handleSubmit = () => {

@@ -1,8 +1,8 @@
-import React, { MutableRefObject, PropsWithChildren } from "react";
+import React, { MutableRefObject, PropsWithChildren, useState } from "react";
+import ReactDOM, { createPortal } from "react-dom";
 import { css, cx } from "@emotion/css";
 
 import { BaseProps } from "types";
-import ReactDOM from "react-dom";
 
 export const Button = React.forwardRef(
   (

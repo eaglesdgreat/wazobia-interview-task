@@ -27,7 +27,7 @@ const VideoUpload: FC<IVideoProps> = ({ videoEmbedData, showUrl }) => {
             onChange={handleChange}
           >
             <option value="youtube">Youtube</option>
-            <option value="netflix">Netflix</option>
+            {/* <option value="netflix">Netflix</option> */}
           </select>
         </div>
 

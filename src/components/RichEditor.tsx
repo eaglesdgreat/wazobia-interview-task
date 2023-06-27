@@ -2,9 +2,9 @@ import "styles/editor.scss";
 
 import { Button, Toolbar } from './RichTextControls';
 import { Editable, ReactEditor, Slate, useFocused, useSelected, useSlate, useSlateStatic, withReact, } from 'slate-react';
-import { Editor, Element, Node, Transforms, createEditor } from 'slate';
+import { Editor, Element, Node, Range, Transforms, createEditor } from 'slate';
 import { FC, useCallback, useContext, useMemo, useState } from 'react';
-import { ImageElement, RichEditorProps, SlateElement, formatType } from 'types';
+import { ImageElement, LinkElement, RichEditorProps, SlateElement, formatType } from 'types';
 import {
   faAlignCenter,
   faAlignJustify,
@@ -21,13 +21,13 @@ import {
   faQuoteRight,
   faUnderline,
 } from "@fortawesome/free-solid-svg-icons";
+import isHotkey, { isKeyHotkey } from 'is-hotkey';
 
 import { EmbedContext } from "context/embed";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Types } from "reducers/embed"
 import { css } from '@emotion/css'
 import imageExtensions from 'image-extensions'
-import isHotkey from 'is-hotkey';
 import isUrl from 'is-url'
 import { withHistory } from "slate-history";
 
@@ -45,7 +45,7 @@ const RichEditor: FC<RichEditorProps> = () => {
   const [showToolbar, setShowToolbar] = useState(false)
   const renderElements = useCallback((props: any) => <Elements {...props} />, []);
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
-  const editor = useMemo(() => withEmbeds(withImages(withHistory(withReact(createEditor())))), []);
+  const editor = useMemo(() => withInLines(withEmbeds(withImages(withHistory(withReact(createEditor()))))), []);
   const { state, dispatch } = useContext(EmbedContext);
 
   const onChangeEditorValue = (val: Node[]) => {
@@ -59,7 +59,7 @@ const RichEditor: FC<RichEditorProps> = () => {
     <Slate editor={editor} value={state.editor} onChange={onChangeEditorValue}>
       {showToolbar && <Toolbar className="editor__toolbar">
           <DropDownButton />
-          <InsertEmbedButton icon="link" />
+          <AddLinkButton />
           <InsertEmbedButton icon="image" />
 
           <BlockButton format="left" icon="align_left" />
@@ -75,7 +75,6 @@ const RichEditor: FC<RichEditorProps> = () => {
           <BlockButton format="block-quote" icon="in_quotes" />
         </Toolbar>
       }
-
       <Editable
         className={!showToolbar ? "editor pad" : "editor"}
         renderElement={renderElements}
@@ -87,11 +86,27 @@ const RichEditor: FC<RichEditorProps> = () => {
           setShowToolbar(true)
         }}
         onKeyDown={(event) => {
+          const { selection } = editor;
+
           for (const hotkey in HOTKEY) {
             if (isHotkey(hotkey, event as any)) {
               event.preventDefault();
               const mark = HOTKEY[hotkey];
               toggleMark(editor, mark);
+            }
+          }
+
+          if (selection && Range.isCollapsed(selection)) {
+            const { nativeEvent } = event
+            if (isKeyHotkey('left', nativeEvent)) {
+              event.preventDefault()
+              Transforms.move(editor, { unit: 'offset', reverse: true })
+              return
+            }
+            if (isKeyHotkey('right', nativeEvent)) {
+              event.preventDefault()
+              Transforms.move(editor, { unit: 'offset' })
+              return
             }
           }
         }}
@@ -243,17 +258,136 @@ const toggleBlock = (editor: Editor, format: string) => {
   }
 }
 
+const withInLines = (editor: ReactEditor) => {
+  const {
+    insertData,
+    insertText,
+    isInline
+  } = editor
+
+  editor.isInline = element =>
+    ['link', 'button', 'badge'].includes((element as any).type) || isInline(element)
+
+  editor.insertText = text => {
+    if (text && isUrl(text)) {
+      wrapLink(editor, text)
+    } else {
+      insertText(text)
+    }
+  }
+
+  editor.insertData = data => {
+    const text = data.getData('text/plain')
+
+    if (text && isUrl(text)) {
+      wrapLink(editor, text)
+    } else {
+      insertData(data)
+    }
+  }
+
+  return editor
+}
+
+const insertLink = (editor: Editor, url: string) => {
+  if (editor.selection) {
+    wrapLink(editor, url)
+  }
+}
+
+const isLinkActive = (editor: Editor) => {
+  const [link] = Editor.nodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && Element.isElement(n) && (n as any).type === 'link',
+  })
+  return !!link
+}
+
+const unwrapLink = (editor: Editor) => {
+  Transforms.unwrapNodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && Element.isElement(n) && (n as any).type === 'link',
+  })
+}
+
+const wrapLink = (editor: Editor, url: string) => {
+  if (isLinkActive(editor)) {
+    unwrapLink(editor)
+  }
+
+  const { selection } = editor
+  const isCollapsed = selection && Range.isCollapsed(selection)
+  const link: LinkElement = {
+    type: 'link',
+    url,
+    children: isCollapsed ? [{ text: url }] : [],
+  }
+
+  if (isCollapsed) {
+    Transforms.insertNodes(editor, link)
+  } else {
+    Transforms.wrapNodes(editor, link, { split: true })
+    Transforms.collapse(editor, { edge: 'end' })
+  }
+}
+
+// Put this at the start and end of an inline component to work around this Chromium bug:
+// https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
+const InlineChromiumBugfix = () => (
+  <span
+    contentEditable={false}
+    className={css`
+      font-size: 0;
+      cursor: pointer;
+    `}
+  >
+    {String.fromCodePoint(160) /* Non-breaking space */}
+  </span>
+)
+
+const AddLinkButton = () => {
+  const editor = useSlate()
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={(event: any) => {
+        event.preventDefault()
+        const url = window.prompt('Enter the URL of the link:')
+        if (!url) return
+        insertLink(editor, url)
+      }}
+    >
+      <FontAwesomeIcon icon={faLink} />
+    </Button>
+  )
+}
+
+/* const RemoveLinkButton = () => {
+  const editor = useSlate()
+
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={(event: any) => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor)
+        }
+      }}
+    >
+      <FontAwesomeIcon icon={faLink} />
+    </Button>
+  )
+} */
+
 const InsertEmbedButton = ({ icon }: { icon: string }) => {
   const editor = useSlateStatic() as ReactEditor
 
-  let thisIcon = faBold;
-  let name = ""
+  let thisIcon = faImage;
+  let name = "editor__border"
 
   if (icon === "image") {
     thisIcon = faImage
     name = "editor__border";
-  } else if (icon === "link") {
-    thisIcon = faLink
   }
 
   return (
@@ -334,6 +468,8 @@ const Elements = ({ attributes, children, element }: {attributes: any; children:
   const style = { textAlign: element.align }
 
   switch (element.type) {
+    case 'link':
+      return <LinkComponent {...{ attributes, children, element }} />
     case 'video':
       return <VideoElement {...{ attributes, children, element }} />
     case 'image':
@@ -381,6 +517,23 @@ const Elements = ({ attributes, children, element }: {attributes: any; children:
         </p>
       )
   }
+}
+
+const LinkComponent = ({ attributes, children, element }: {attributes: any; children: any; element: any}) => {
+  const selected = useSelected()
+
+  return (
+    <>
+      <div
+        dangerouslySetInnerHTML={{ __html: element.code }}
+        className={css`
+          position: relative;
+          border-radius: 4px;
+          padding: 15px 0;
+        `}
+      ></div>
+    </>
+  )
 }
 
 const VideoElement = ({ attributes, children, element }: {attributes: any; children: any; element: any}) => {

@@ -31,7 +31,7 @@ const SocialLink: FC<ISocialProps> = ({ socialEmbedData, showUrl }) => {
             onChange={handleChange}
           >
             <option value="facebook">Facebook</option>
-            <option value="twitter">Twitter</option>
+            {/* <option value="twitter">Twitter</option> */}
           </select>
         </div>
 
