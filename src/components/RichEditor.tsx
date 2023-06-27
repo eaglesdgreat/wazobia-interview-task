@@ -384,7 +384,6 @@ const Elements = ({ attributes, children, element }: {attributes: any; children:
 }
 
 const VideoElement = ({ attributes, children, element }: {attributes: any; children: any; element: any}) => {
-  // const editor = useSlateStatic()
   const { url } = element
   return (
     <div {...attributes}>
@@ -417,9 +416,6 @@ const VideoElement = ({ attributes, children, element }: {attributes: any; child
 }
 
 const Image = ({ attributes, children, element }: {attributes: any; children: any; element: any}) => {
-  const editor = useSlateStatic() as ReactEditor
-  const path = ReactEditor.findPath(editor, element)
-
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -434,7 +430,7 @@ const Image = ({ attributes, children, element }: {attributes: any; children: an
           height: 0;
           overflow: hidden;
           width: 41em;
-          height: 22em;
+          height: 20.5em;
         `}
       >
         <img

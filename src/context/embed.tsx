@@ -1,11 +1,9 @@
 import { Dispatch, FC, ReactElement, createContext, useReducer } from "react";
 import { EmbedActions, embedReducer } from "reducers/embed";
-import { IEmbedContextProps, socialType } from "types";
+
+import { IEmbedContextProps } from "types";
 
 interface IProps {
-  type?: string
-  url?: string
-  value?: socialType
   children: ReactElement;
 }
 

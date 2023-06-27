@@ -57,3 +57,18 @@ export interface IEmbedContextProps {
   image: string
   editor: Node[]
 }
+
+export interface IImageProps {
+  imageEmbedData: (data: any) => void;
+  showUrl: boolean
+}
+
+export interface ISocialProps {
+  socialEmbedData: (data: any) => void;
+  showUrl: boolean
+}
+
+export interface IVideoProps {
+  videoEmbedData: (data: any) => void;
+  showUrl: boolean
+}

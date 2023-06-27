@@ -1,13 +1,7 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { IEmbedSocialProps, ISocialProps } from "types"
 
-import { IEmbedSocialProps } from "types"
-
-interface IProps {
-  socialEmbedData: (data: any) => void;
-  showUrl: boolean
-}
-
-const SocialLink: FC<IProps> = ({ socialEmbedData, showUrl }) => {
+const SocialLink: FC<ISocialProps> = ({ socialEmbedData, showUrl }) => {
   const [form, setForm] = useState<IEmbedSocialProps>({ social: "", url: "", code: "", disable: false })
 
   useEffect(() => {

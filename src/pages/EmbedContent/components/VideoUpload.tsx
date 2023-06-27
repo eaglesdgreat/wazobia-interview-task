@@ -1,13 +1,7 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react';
+import { IEmbedVideoProps, IVideoProps } from "types"
 
-import { IEmbedVideoProps } from "types"
-
-interface IProps {
-  videoEmbedData: (data: any) => void;
-  showUrl: boolean
-}
-
-const VideoUpload: FC<IProps> = ({ videoEmbedData, showUrl }) => {
+const VideoUpload: FC<IVideoProps> = ({ videoEmbedData, showUrl }) => {
   const [form, setForm] = useState<IEmbedVideoProps>({ channel: "", url: "" })
 
   useEffect(() => {

@@ -43,21 +43,3 @@ export const embedReducer = (state: IEmbedContextProps, action: EmbedActions) =>
       return state;
   }
 }
-
-// type EditorPayload = {
-//   [Types.EditorText]: Node[]
-// }
-
-// export type EditorActions = ActionMap<EditorPayload>[keyof ActionMap<EditorPayload>];
-
-// export const editorReducer = (state: IEmbedContextProps, action: EmbedActions | EditorActions) => {
-//   switch (action.type) {
-//     case Types.EditorText:
-//         return { ...state, editor: action.payload };
-//     default:
-//       return state;
-//   }
-// }
-
-
-// export default embedReducer;

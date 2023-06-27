@@ -1,11 +1,8 @@
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 
-interface IProps {
-  imageEmbedData: (data: any) => void;
-  showUrl: boolean
-}
+import { IImageProps } from "types"
 
-const ImageUpload: FC<IProps> = ({ imageEmbedData, showUrl }) => {
+const ImageUpload: FC<IImageProps> = ({ imageEmbedData, showUrl }) => {
   // const [currentImage, setCurrentImage] = useState<File>();
   const [currentImage, setCurrentImage] = useState<string>();
   // const [previewImage, setPreviewImage] = useState<string>("");
